@@ -1,4 +1,11 @@
-#
+#---------------------------------------------------------------
+#██████╗  █████╗ ███████╗██╗  ██╗██████╗  ██████╗
+#██╔══██╗██╔══██╗██╔════╝██║  ██║██╔══██╗██╔════╝
+#██████╔╝███████║███████╗███████║██████╔╝██║
+#██╔══██╗██╔══██║╚════██║██╔══██║██╔══██╗██║
+#██████╔╝██║  ██║███████║██║  ██║██║  ██║╚██████╗
+#╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝
+#---------------------------------------------------------------
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
@@ -41,6 +48,24 @@ shopt -s checkwinsize # checks term size when bash regains control
 #ignore upper and lowercase when TAB completion
 bind "set completion-ignore-case on"
 
+#set a different editor
+export EDITOR=nvim
+export VISUAL=nvim
+
+
+# Check that we are root!
+if [[ ! $(whoami) =~ "root" ]]; then
+echo ""
+echo "**********************************"
+echo "*** This needs to run as root! ***"
+echo "**********************************"
+echo ""
+exit
+fi
+
+
+
+#---------------------------------------------------------------
 ### ARCHIVE EXTRACTION
 # usage: ex <file>
 ex ()
@@ -68,15 +93,67 @@ ex ()
   fi
 }
 
-### ALIASES ###
 
+#---------------------------------------------------------------
+# print pihole status directly from pihole CLI
+echo -e "\n${BLUE_solid}Pihole${NC}"
+pihole status
+
+
+# Print free & used RAM
+echo -e "\n${BLUE_solid}RAM${NC}"
+echo -e "Free=${GREEN}$freeRAM MB${NC} ; Used=${RED}$usedRAM MB${NC}; Cache=${CYAN}$cacheRAM MB${NC}"
+
+
+# Potential alternatives
+# temp=$(/opt/vc/bin/vcgencmd measure_temp | egrep -o '[0-9]*\.[0-9]*')
+# freq=$(/opt/vc/bin/vcgencmd measure_clock arm | cut -d'=' -f 2) # in MHz
+# freq=$((freq/1000000))
+
+
+#---------------------------------------------------------------
+# █████╗ ██╗     ██╗ █████╗ ███████╗███████╗███████╗
+#██╔══██╗██║     ██║██╔══██╗██╔════╝██╔════╝██╔════╝
+#███████║██║     ██║███████║███████╗█████╗  ███████╗
+#██╔══██║██║     ██║██╔══██║╚════██║██╔══╝  ╚════██║
+#██║  ██║███████╗██║██║  ██║███████║███████╗███████║
+#╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+#---------------------------------------------------------------
+
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+
+#if [ -f ~/.bash_aliases ]; then
+#    . ~/.bash_aliases
+#fi
+
+
+#---------------------------------------------------------------
+# update
+alias update='sudo apt update && sudo apt upgrade'
+
+
+#---------------------------------------------------------------
+# off and reboot
+alias shut="shutdown now"
+alias reb="reboot"
+
+# safe and forced reboots
+alias rebootsafe='sudo shutdown -r now'
+alias rebootforce='sudo shutdown -r -n now'
+
+
+#---------------------------------------------------------------
+# temperature
+alias temp='/usr/bin/vcgencmd measure_temp'
+
+
+#---------------------------------------------------------------
 # root privileges
 # alias doas="doas --"
 
 
-# vim
-alias vim="nvim"
-
+#---------------------------------------------------------------
 # Changing "ls" to "exa"
 alias ls='exa -al --color=always --group-directories-first' # my preferred listing
 alias la='exa -a --color=always --group-directories-first'  # all files and dirs
@@ -84,18 +161,39 @@ alias ll='exa -l --color=always --group-directories-first'  # long format
 alias lt='exa -aT --color=always --group-directories-first' # tree listing
 alias l.='exa -a | egrep "^\."'
 
+
+#---------------------------------------------------------------
+# text editors
 # nano
-alias na='sudo nano -l'
+alias nano='sudo nano -l'
+# vim
+alias vim="nvim"
+#alias nvimrc='nvim ~/.config/nvim/'
 
-#set a different editor
-export EDITOR=nvim
-export VISUAL=nvim
 
-# Colorize grep output (good for log files)
+#---------------------------------------------------------------
+# speedtest
+alias st="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -"
+
+
+#---------------------------------------------------------------
+# weather
+alias wtr="curl wttr.in"
+
+
+#---------------------------------------------------------------
+# cheat sheet commands
+#alias cheatsh="curl https://cheat.sh/"
+
+
+#---------------------------------------------------------------
+# colorize grep output (good for log files)
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
+
+#---------------------------------------------------------------
 # confirm before overwriting something
 alias cp="cp -i"
 alias mv='mv -i'
@@ -106,6 +204,8 @@ alias ping='ping -c 10'
 alias less='less -R'
 alias cls='clear'
 
+
+#---------------------------------------------------------------
 # git
 alias addup='git add -u'
 alias addall='git add .'
@@ -120,14 +220,19 @@ alias stat='git status'  # 'status' is protected name so using 'stat' instead
 alias tag='git tag'
 alias newtag='git tag -a'
 
-# alias chmod commands
-alias mx='chmod a+x'
+
+#---------------------------------------------------------------
+# chmod commands
+#alias mx='chmod a+x'
+alias ux='chmod u+x'
 alias 000='chmod -R 000'
 alias 644='chmod -R 644'
 alias 666='chmod -R 666'
 alias 755='chmod -R 755'
-alias 777='chmod -R 777'
+#alias 777='chmod -R 777'
 
+
+#---------------------------------------------------------------
 # adding flags
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
@@ -136,87 +241,24 @@ alias vifm='./.config/vifm/scripts/vifmrun'
 alias ncmpcpp='ncmpcpp ncmpcpp_directory=$HOME/.config/ncmpcpp/'
 alias mocp='mocp -M "$XDG_CONFIG_HOME"/moc -O MOCDir="$XDG_CONFIG_HOME"/moc'
 
-# update
-alias update='sudo apt update && sudo apt upgrade'
 
-# temperature
-alias temp='/usr/bin/vcgencmd measure_temp'
-
+#---------------------------------------------------------------
 # ps
 alias psa="ps auxf"
 alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-alias psmem='ps auxf | sort -nr -k 4'
-alias pscpu='ps auxf | sort -nr -k 3'
-
-# Merge Xresources
-# alias merge='xrdb -merge ~/.Xresources'                                                           # inactive
-
-# get error messages from journalctl
-alias jctl="journalctl -p 3 -xb"
-
-# gpg encryption
-# verify signature for isos
-# alias gpg-check="gpg2 --keyserver-options auto-key-retrieve --verify"                             # inactive
-# receive the key of a developer
-# alias gpg-retrieve="gpg2 --keyserver-options auto-key-retrieve --receive-keys"                    # inactive
-
-# youtube-dl
-alias yta-aac="youtube-dl --extract-audio --audio-format aac "
-alias yta-best="youtube-dl --extract-audio --audio-format best "
-alias yta-flac="youtube-dl --extract-audio --audio-format flac "
-alias yta-m4a="youtube-dl --extract-audio --audio-format m4a "
-alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
-alias yta-opus="youtube-dl --extract-audio --audio-format opus "
-alias yta-vorbis="youtube-dl --extract-audio --audio-format vorbis "
-alias yta-wav="youtube-dl --extract-audio --audio-format wav "
-alias ytv-best="youtube-dl -f bestvideo+bestaudio "
-
-# off and reboot
-alias shut="sudo shutdown now"
-alias reb="reboot"
+alias psmem='ps auxf | sort -nr -k 4 | head -5'
+alias pscpu='ps auxf | sort -nr -k 3 | head -5'
 
 
-# set a fancy prompt
+#---------------------------------------------------------------
+# recent installed packages
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
+alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
 
 
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
+#---------------------------------------------------------------
+# userlist
+alias userlist="cut -d: -f1 /etc/passwd"
 
-#if [ -f ~/.bash_aliases ]; then
-#    . ~/.bash_aliases
-#fi
-
-
-# Check that we are root!
-if [[ ! $(whoami) =~ "root" ]]; then
-echo ""
-echo "**********************************"
-echo "*** This needs to run as root! ***"
-echo "**********************************"
-echo ""
-exit
-fi
-
-
-# print pihole status directly from pihole CLI
-echo -e "\n${BLUE_solid}Pihole${NC}"
-pihole status
-
-
-# Print free & used RAM
-
-echo -e "\n${BLUE_solid}RAM${NC}"
-echo -e "Free=${GREEN}$freeRAM MB${NC} ; Used=${RED}$usedRAM MB${NC}; Cache=${CYAN}$cacheRAM MB${NC}"
-
-
-# Potential alternatives
-# temp=$(/opt/vc/bin/vcgencmd measure_temp | egrep -o '[0-9]*\.[0-9]*')
-# freq=$(/opt/vc/bin/vcgencmd measure_clock arm | cut -d'=' -f 2) # in MHz
-# freq=$((freq/1000000))
-
-
-#run any app at terminal startup
-#neofetch
-
-
-
+#---------------------------------------------------------------
+#---------------------------------------------------------------
