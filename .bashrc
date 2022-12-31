@@ -6,9 +6,9 @@
 #██████╔╝██║  ██║███████║██║  ██║██║  ██║╚██████╗
 #╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝
 #---------------------------------------------------------------
+
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-
 
 PS1='[\u@\h \W]\$ '
 
@@ -47,6 +47,7 @@ shopt -s checkwinsize # checks term size when bash regains control
 
 #ignore upper and lowercase when TAB completion
 bind "set completion-ignore-case on"
+
 
 #set a different editor
 export EDITOR=nvim
